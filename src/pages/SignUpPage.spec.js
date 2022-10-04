@@ -1,6 +1,7 @@
 import SignUpPage from './SignUpPage.vue'
 import {render, screen} from '@testing-library/vue'
 import '@testing-library/jest-dom'
+import userEvent from '@testing-library/user-event'
 
 describe('Sign up page', () => {
   describe('Layout', () => {
@@ -60,5 +61,18 @@ describe('Sign up page', () => {
       const button = screen.queryByRole('button', {name: 'Sign Up'})
       expect(button).toBeDisabled()
     })
-  })  
+  })
+  describe('Interactions', () => {
+    test ('enables button if passwords matches', async () => {
+      render (SignUpPage)
+      const passwordInput = screen.queryByLabelText('Password')
+      const passwordRepeatInput = screen.queryByLabelText('Password repeat')
+
+      await userEvent.type(passwordInput, 'P4ssword')
+      await userEvent.type(passwordRepeatInput, 'P4ssword')
+
+      const button = screen.queryByRole('button', {name: 'Sign Up'})
+      expect(button).toBeEnabled()
+    })
+  })
 })

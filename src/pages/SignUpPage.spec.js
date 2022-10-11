@@ -74,5 +74,16 @@ describe('Sign up page', () => {
       const button = screen.queryByRole('button', {name: 'Sign Up'})
       expect(button).toBeEnabled()
     })
+    test ('sends username, email and password to backend after clicking the button', async () => {
+      render (SignUpPage)
+      const passwordInput = screen.queryByLabelText('Password')
+      const passwordRepeatInput = screen.queryByLabelText('Password repeat')
+
+      await userEvent.type(passwordInput, 'P4ssword')
+      await userEvent.type(passwordRepeatInput, 'P4ssword')
+
+      const button = screen.queryByRole('button', {name: 'Sign Up'})
+      expect(button).toBeEnabled()
+    })
   })
 })

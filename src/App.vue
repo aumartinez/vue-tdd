@@ -1,5 +1,5 @@
 <script setup>
-  import SignUpPage from './pages/SignUpPage.vue'
+import SignUpPage from './pages/SignUpPage.vue'
 </script>
 
 <template>

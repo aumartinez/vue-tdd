@@ -2,7 +2,10 @@ import SignUpPage from './SignUpPage.vue'
 import {render, screen} from '@testing-library/vue'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
-import axios from 'axios'
+// import axios from 'axios'
+import 'whatwg-fetch'
+import { setupServer } from 'msw/node'
+import { rest } from 'msw'
 
 describe('Sign up page', () => {
   describe('Layout', () => {
@@ -75,31 +78,41 @@ describe('Sign up page', () => {
       const button = screen.queryByRole('button', {name: 'Sign Up'})
       expect(button).toBeEnabled()
     })
-    test ('sends username, email and password to backend after clicking the button', async () => {
+    test ('sends username, email and password to backend after clicking the button', 
+    async () => {
+      let requestBody      
+      const server = setupServer(        
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          requestBody = req.body
+          return res(ctx.status(200))
+        })
+      )
+
+      server.listen()
+
       render (SignUpPage)
       const usernameInput = screen.queryByLabelText('Username')
       const emailInput = screen.queryByLabelText('E-mail')
-
       const passwordInput = screen.queryByLabelText('Password')
       const passwordRepeatInput = screen.queryByLabelText('Password repeat')
 
       await userEvent.type(usernameInput, 'user1')
       await userEvent.type(emailInput, 'user1@email.com')
-
       await userEvent.type(passwordInput, 'P4ssword')
       await userEvent.type(passwordRepeatInput, 'P4ssword')
 
       const button = screen.queryByRole('button', {name: 'Sign Up'})
-
-      const mockFn = jest.fn()
-      axios.post = mockFn
-
       await userEvent.click(button)
+      await server.close()
 
-      const firstCall = mockFn.mock.calls[0]
-      const body = firstCall[1]
+      // const mockFn = jest.fn()
+      // axios.post = mockFn
+      // window.fetch = mockFn      
 
-      expect(body).toEqual({
+      // const firstCall = mockFn.mock.calls[0]
+      // const body = JSON.parse(firstCall[1].body)
+
+      expect(requestBody).toEqual({
         username: 'user1',
         email: 'user1@email.com',
         password: 'P4ssword'

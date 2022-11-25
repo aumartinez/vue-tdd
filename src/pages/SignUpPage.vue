@@ -1,5 +1,5 @@
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'SignUpPage',
@@ -13,24 +13,24 @@ export default {
   },
   methods: {
     submit() {      
-      // axios.post('/api/1.0/users', {
-      //   username: this.username,
-      //   email: this.email,
-      //   password: this.password,
-      // })
-      const requestBody = {
+      axios.post('/api/1.0/users', {
         username: this.username,
         email: this.email,
-        password: this.password
-      }
-
-      fetch('api/1.0/users', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        password: this.password,
       })
+      // const requestBody = {
+      //   username: this.username,
+      //   email: this.email,
+      //   password: this.password
+      // }
+
+      // fetch('localhost:8090/api/1.0/users', {
+      //   method: 'POST',
+      //   body: JSON.stringify(requestBody),
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // })
     }
   },
   computed: {
@@ -74,7 +74,7 @@ export default {
           
           <button 
           type="submit"
-          class="btn btn-primary"
+          class="btn btn-primary w-100"
           @click.prevent="submit"
           :disabled="isDisabled">Sign Up</button>
         </form>

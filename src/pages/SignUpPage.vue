@@ -5,14 +5,18 @@ export default {
   name: 'SignUpPage',
   data () {
     return {
+      disabled: false,
       username: '',
       email: '',
       password: '',
-      passwordRepeat: ''
+      passwordRepeat: '',
+      apiProgress: false
     }
   },
   methods: {
-    submit() {      
+    submit() {
+      this.disabled = true
+      this.apiProgress = true
       axios.post('/api/1.0/users', {
         username: this.username,
         email: this.email,
@@ -47,7 +51,7 @@ export default {
   <div class="container">
     <div class="row">
       <div class="col-md-6 offset-md-3 pt-5 pb-5">
-        <h1>Sign Up</h1>
+        <h1 class="text-center">Sign Up</h1>
         <form>
           <label for="username" class="form-label">Username</label>          
           <input 
@@ -76,13 +80,17 @@ export default {
           type="submit"
           class="btn btn-primary w-100"
           @click.prevent="submit"
-          :disabled="isDisabled">Sign Up</button>
+          :disabled="isDisabled || disabled">
+            <span 
+            v-if="apiProgress"
+            class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Sign Up
+          </button>
         </form>
       </div>
     </div>    
   </div>  
 </template>
 
-<style scoped>
- 
+<style scoped> 
 </style>

@@ -67,6 +67,19 @@ describe('Sign up page', () => {
     })
   })
   describe('Interactions', () => {
+    const setup = async () => {
+      render(SignUpPage)
+      const usernameInput = screen.queryByLabelText('Username')
+      const emailInput = screen.queryByLabelText('E-mail')
+      const passwordInput = screen.queryByLabelText('Password')
+      const passwordRepeatInput = screen.queryByLabelText('Password repeat')
+
+      await userEvent.type(usernameInput, 'user1')
+      await userEvent.type(emailInput, 'user1@email.com')
+      await userEvent.type(passwordInput, 'P4ssword')
+      await userEvent.type(passwordRepeatInput, 'P4ssword')
+    }
+
     test ('enables button if passwords matches', async () => {
       render (SignUpPage)
       const passwordInput = screen.queryByLabelText('Password')
@@ -117,6 +130,49 @@ describe('Sign up page', () => {
         email: 'user1@email.com',
         password: 'P4ssword'
       })
+    })
+
+    test('does not allow clicking to the button when there is an ongoing api call', 
+    async () => {
+      let counter = 0
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          counter++
+          return res(ctx.status(200))
+        })
+      )
+      server.listen()
+      await setup()
+      const button = screen.queryByRole('button', {name: 'Sign Up'})
+      await userEvent.click(button)
+      await userEvent.click(button)
+
+      await server.close()
+      expect(counter).toBe(1)
+    })
+
+    test('display spinner while the api request is in progress',
+    async () => {
+      const server = setupServer(
+        rest.post('/api/1.0/users', (req, res, ctx) => {
+          return res(ctx.status(200))
+        })
+      )
+      server.listen()
+      await setup()
+      const button = screen.queryByRole('button', {name: 'Sign Up'})
+
+      await userEvent.click(button)
+
+      const spinner = screen.queryByRole('status')
+      expect(spinner).toBeInTheDocument
+    })
+
+    test('do not display spinner if there is no api request', 
+    async () => {
+      await setup()
+      const spinner = screen.queryByRole('status')
+      expect(spinner).not.toBeInTheDocument()
     })
   })
 })
